@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from locations.request import get_all_locations, get_single_location
 from animals import get_all_animals, get_single_animal
+from employees import get_all_employees, get_single_employee
 
 # Here's a class. It inherits from another class.
 # For now, think of a class as a container for functions that
@@ -59,13 +60,20 @@ class HandleRequests(BaseHTTPRequestHandler):
 
             else:
                 response = f"{get_all_animals()}"
-        #Book 1 Chapter 3 exercise
+        #Book 1 Chapter 3 exercise - locations
         if resource == "locations":
             if id is not None:
                 response = f"{get_single_location(id)}"
             
             else:
                 response = f"{get_all_locations()}"
+        #Book 1 Chapter 3 exercise - employees
+        if resource == "employees":
+            if id is not None:
+                response = f"{get_single_employee(id)}"
+
+            else:
+                response = f"{get_all_employees()}"
 
 
         self.wfile.write(response.encode())
