@@ -39,3 +39,18 @@ def create_location(location):
 
     # return the dict w/ id property added
     return location
+
+# function to delete location - accepts location id as parameter
+def delete_location(id):
+    location_index = -1
+
+    # Iterate the LOCATIONS list, but use enumerate() so that you
+    # can access the index value of each item
+    for index, location in enumerate(LOCATIONS):
+        if location["id"] == id:
+            # Found the location. Store the current index.
+            location_index = index
+
+    # If the location was found, use pop(int) to remove it from list
+    if location_index >= 0:
+        LOCATIONS.pop(location_index)

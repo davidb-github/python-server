@@ -41,3 +41,16 @@ def create_employee(employee):
     EMPLOYEES.append(employee)
 
     return employee
+
+# function to delete employee - accepts employee id as parameter
+def delete_employee(id):
+    employee_index = -1
+
+    for index, employee in enumerate(EMPLOYEES):
+        if employee["id"] == id:
+            # Found the employee. Store the current index.
+            employee_index = index
+
+    # If the employee was found, use pop(int) to remove it from list
+    if employee_index >= 0:
+        EMPLOYEES.pop(employee_index)
