@@ -2,12 +2,14 @@ LOCATIONS = [
     {
         "id": 1,
         "name": "Nashville North",
-        "address": "8422 Johnson Pike"
+        "address": "8422 Johnson Pike",
+        "status": "Open"
     },
     {
         "id": 2,
         "name": "Nashville South",
-        "address": "209 Emory Drive"
+        "address": "209 Emory Drive",
+        "status": "Open"
     }
 ]
 
@@ -23,7 +25,7 @@ def get_single_location(id):
         if location["id"] == id:
             requested_location = location
 
-    return requested_location        
+    return requested_location
 
 
 # function to create new location - accepts location parameter
@@ -32,7 +34,7 @@ def create_location(location):
     max_id = LOCATIONS[-1]["id"]
     # increment max_id
     new_id = max_id + 1
-    # add an `id` property to the animal dictionary
+    # add an `id` property to the location dictionary
     location["id"] = new_id
     # add the location dict to the list
     LOCATIONS.append(location)
@@ -54,3 +56,13 @@ def delete_location(id):
     # If the location was found, use pop(int) to remove it from list
     if location_index >= 0:
         LOCATIONS.pop(location_index)
+
+# update existing location - accepts location id and new_location dict as input parameters
+def update_location(id, new_location):
+    # Iterate the LOCATIONS list, but use enumerate() so that
+    # you can access the index value of each item.
+    for index, location in enumerate(LOCATIONS):
+        if location["id"] == id:
+            # Found the location. Update the value.
+            LOCATIONS[index] = new_location
+            break

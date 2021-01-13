@@ -3,19 +3,22 @@ EMPLOYEES = [
         "name": "david",
         "locationId": 1,
         "animalId": 1,
-        "id": 1
+        "id": 1,
+        "full-time": True
     },
     {
         "name": "sam",
         "locationId": 1,
         "animalId": 1,
-        "id": 2
+        "id": 2,
+        "full-time": True
     },
     {
         "name": "daniel",
         "locationId": 2,
         "animalId": 1,
-        "id": 3
+        "id": 3,
+        "full-time": True
     }
 ]
 
@@ -54,3 +57,13 @@ def delete_employee(id):
     # If the employee was found, use pop(int) to remove it from list
     if employee_index >= 0:
         EMPLOYEES.pop(employee_index)
+
+# update existing employee - accepts employee id and new_employee dict as input parameters
+def update_employee(id, new_employee):
+    # Iterate the EMPLOYEES list, but use enumerate() so that
+    # you can access the index value of each item.
+    for index, employee in enumerate(EMPLOYEES):
+        if employee["id"] == id:
+            # Found the employee. Update the value.
+            EMPLOYEES[index] = new_employee
+            break
