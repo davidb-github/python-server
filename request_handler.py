@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from locations.request import get_all_locations, get_single_location,create_location
 from animals import get_all_animals, get_single_animal, create_animal
-from employees import get_all_employees, get_single_employee
+from employees import get_all_employees, get_single_employee,create_employee
 import json
 
 # Here's a class. It inherits from another class.
@@ -92,16 +92,16 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
-        # Initialize new animal
+        # Initialize new resource var
         new_resource = None
 
-        # Add a new animal to the list.
+        # Add a new resource to the list.
         if resource == "animals":
             new_resource = create_animal(post_body)
-        
-        #Book 4 practice - add new location
         elif resource == "locations":
             new_resource = create_location(post_body)
+        elif resource == "employees":
+            new_resource = create_employee(post_body)
 
         # Encode the new resource and send in response
         self.wfile.write(f"{new_resource}".encode())
