@@ -95,9 +95,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Initialize new animal
         new_resource = None
 
-        # Add a new animal to the list. Don't worry about
-        # the orange squiggle, you'll define the create_animal
-        # function next.
+        # Add a new animal to the list.
         if resource == "animals":
             new_resource = create_animal(post_body)
         
