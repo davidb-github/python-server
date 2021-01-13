@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from locations.request import get_all_locations, get_single_location,create_location, delete_location, update_location
 from animals import get_all_animals, get_single_animal, create_animal, delete_animal, update_animal
-from employees import get_all_employees, get_single_employee,create_employee, delete_employee
+from employees import get_all_employees, get_single_employee,create_employee, delete_employee, update_employee
 from customers import get_all_customers,get_single_customer,create_customer, delete_customer
 import json
  
@@ -129,13 +129,15 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
-        # Delete a single animal from the list
+        # Update a single resource from the list
         if resource == "animals":
             update_animal(id, post_body)
         elif resource == "locations":
             update_location(id, post_body)
+        elif resource == "employees":
+            update_employee(id, post_body)
 
-        # Encode the new animal and send in response
+        # Encode the new resource and send in response
         self.wfile.write("".encode())
     
     # book 1 - Chapter 5 - implement DELETE
