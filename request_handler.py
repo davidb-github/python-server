@@ -122,7 +122,7 @@ class HandleRequests(BaseHTTPRequestHandler):
     #    self.do_POST()
     def do_PUT(self):
         self._set_headers(204)
-        content_len = int(self.headers.get('content-length', 0))
+        content_len = int(self.headers.get('content-length', 0)) # 2nd arg is in case the content_len header does not exist
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
 

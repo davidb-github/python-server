@@ -1,24 +1,24 @@
 EMPLOYEES = [
     {
         "name": "david",
-        "locationId": 1,
-        "animalId": 1,
+        "location_id": 1,
+        "animal_id": 1,
         "id": 1,
-        "full-time": True
+        "fte": True
     },
     {
         "name": "sam",
-        "locationId": 1,
-        "animalId": 1,
+        "location_id": 1,
+        "animal_id": 1,
         "id": 2,
-        "full-time": True
+        "fte": True
     },
     {
         "name": "daniel",
-        "locationId": 2,
-        "animalId": 1,
+        "location_id": 2,
+        "animal_id": 1,
         "id": 3,
-        "full-time": True
+        "fte": True
     }
 ]
 
