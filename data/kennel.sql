@@ -69,3 +69,14 @@ FROM Employee;
 
 SELECT *
 FROM Location;
+
+-- Get only the animal rows where the `id` field value is 3
+SELECT
+    a.id,
+    a.name,
+    a.breed,
+    a.status,
+    a.location_id,
+    a.customer_id
+FROM animal a
+WHERE a.id = 2
