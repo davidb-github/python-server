@@ -54,7 +54,7 @@ def get_all_employees():
 
         #iterate list of data returned from db
         for row in dataset:
-            employee = Employee(row['id'], row['name'], row['address'], ['location_id'])
+            employee = Employee(row['id'], row['name'], row['address'], row['location_id'])
 
             employees.append(employee.__dict__)
 
@@ -63,14 +63,40 @@ def get_all_employees():
 
 
 # return employee by id
-def get_single_employee(id):
-    requested_employee = None
+# def get_single_employee(id):
+#     requested_employee = None
 
-    for employee in EMPLOYEES:
-        if employee["id"] == id:
-            requested_employee = employee
+#     for employee in EMPLOYEES:
+#         if employee["id"] == id:
+#             requested_employee = employee
     
-    return requested_employee
+#     return requested_employee
+
+
+# return employee by id
+def get_single_employee(id):
+    with sqlite3.connect("./kennel.db") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        SELECT
+            e.id,
+            e.name,
+            e.address,
+            e.location_id
+        FROM employee AS e
+        WHERE e.id = ?
+        """, ( id, ))
+
+        # load the single result into memory
+        data = db_cursor.fetchone()
+
+        #create an employee instance from the current row
+        employee = Employee(data['id'], data['name'], data['address'], data['location_id'])
+
+    return json.dumps(employee.__dict__)
+
 
 # add new employee - accepts employee parameter
 def create_employee(employee):
