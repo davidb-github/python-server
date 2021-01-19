@@ -1,3 +1,7 @@
+import sqlite3
+import json
+from models import Location
+
 LOCATIONS = [
     {
         "id": 1,
@@ -14,8 +18,42 @@ LOCATIONS = [
 ]
 
 # return all locations
+# def get_all_locations():
+#     return LOCATIONS
+
+#return all locations via sql
 def get_all_locations():
-    return LOCATIONS
+    with sqlite3.connect("./kennel.db") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        SELECT
+            l.id,
+            l.name,
+            l.address
+        FROM location l
+        """)
+
+        # init empty list to hold all locations
+        locations = []
+
+        # convert rows of data into a Python list
+        dataset = db_cursor.fetchall()
+
+        # Iterate list of data returned from database
+        for row in dataset:
+
+            # Create a location instance from the current row.
+            # Note that the database fields are specified in
+            # exact order of the parameters defined in the
+            # Location class above.
+            location = Location(row['id'], row['name'], row['address'])
+
+            locations.append(location.__dict__)
+    # Use `json` package to properly serialize list as JSON
+    return json.dumps(locations)
+
 
 # Return single location by id
 def get_single_location(id):
