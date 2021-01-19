@@ -1,3 +1,8 @@
+import sqlite3
+import json
+from models import Employee, employee
+
+
 EMPLOYEES = [
     {
         "name": "david",
@@ -23,8 +28,39 @@ EMPLOYEES = [
 ]
 
 # return all employees
+# def get_all_employees():
+#     return EMPLOYEES
+
+# return all employees - sql
 def get_all_employees():
-    return EMPLOYEES
+    with sqlite3.connect("./kennel.db") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        SELECT
+            e.id,
+            e.name,
+            e.address,
+            e.location_id
+        FROM employee e
+        """)
+
+        # init an empty list to hold employee representations
+        employees = []
+
+        # convert rows of data into python list
+        dataset = db_cursor.fetchall()
+
+        #iterate list of data returned from db
+        for row in dataset:
+            employee = Employee(row['id'], row['name'], row['address'], ['location_id'])
+
+            employees.append(employee.__dict__)
+
+    # Use `json` package to properly serialize list as JSON
+    return json.dumps(employees)
+
 
 # return employee by id
 def get_single_employee(id):
