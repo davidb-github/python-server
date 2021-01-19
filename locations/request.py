@@ -1,3 +1,7 @@
+import sqlite3
+import json
+from models import Location
+
 LOCATIONS = [
     {
         "id": 1,
@@ -14,18 +18,82 @@ LOCATIONS = [
 ]
 
 # return all locations
+# def get_all_locations():
+#     return LOCATIONS
+
+# return all locations via sql
+
+
 def get_all_locations():
-    return LOCATIONS
+    with sqlite3.connect("./kennel.db") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        SELECT
+            l.id,
+            l.name,
+            l.address
+        FROM location l
+        """)
+
+        # init empty list to hold all locations
+        locations = []
+
+        # convert rows of data into a Python list
+        dataset = db_cursor.fetchall()
+
+        # Iterate list of data returned from database
+        for row in dataset:
+
+            # Create a location instance from the current row.
+            # Note that the database fields are specified in
+            # exact order of the parameters defined in the
+            # Location class above.
+            location = Location(row['id'], row['name'], row['address'])
+
+            locations.append(location.__dict__)
+    # Use `json` package to properly serialize list as JSON
+    return json.dumps(locations)
+
 
 # Return single location by id
+# def get_single_location(id):
+#     requested_location = None
+
+#     for location in LOCATIONS:
+#         if location["id"] == id:
+#             requested_location = location
+
+#     return requested_location
+
+# return single location by id
 def get_single_location(id):
-    requested_location = None
+    with sqlite3.connect("./kennel.db") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
 
-    for location in LOCATIONS:
-        if location["id"] == id:
-            requested_location = location
+     # Use a ? parameter to inject a variable's value
+     # into the SQL statement.
+        db_cursor.execute("""
+        SELECT
+            l.id,
+            l.name,
+            l.address
+        FROM location AS l
+        WHERE l.id = ?
+        """, (id, ))
 
-    return requested_location
+        # load the single result into memory
+        data = db_cursor.fetchone()
+
+        #create a location instance from the current row
+        location = Location(data['id'], data['name'], data['address'])
+
+        #return new location instance
+        return json.dumps(location.__dict__)
+
+
 
 
 # function to create new location - accepts location parameter
@@ -43,6 +111,8 @@ def create_location(location):
     return location
 
 # function to delete location - accepts location id as parameter
+
+
 def delete_location(id):
     location_index = -1
 
@@ -58,6 +128,8 @@ def delete_location(id):
         LOCATIONS.pop(location_index)
 
 # update existing location - accepts location id and new_location dict as input parameters
+
+
 def update_location(id, new_location):
     # Iterate the LOCATIONS list, but use enumerate() so that
     # you can access the index value of each item.

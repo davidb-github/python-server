@@ -1,3 +1,7 @@
+import sqlite3
+import json
+from models import Customer
+
 CUSTOMERS = [
      {
         "email": "jake@jake.com",
@@ -16,18 +20,81 @@ CUSTOMERS = [
 ]
 
 # return all customers
+# def get_all_customers():
+#     return CUSTOMERS
+
+# return all customers - sql
 def get_all_customers():
-    return CUSTOMERS
+    #open a connection to db
+    with sqlite3.connect("./kennel.db") as conn:
+
+        # setup row and cursor
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        # select query
+        db_cursor.execute("""
+        SELECT
+            c.id,
+            c.name,
+            c.address,
+            c.email,
+            c.password
+        FROM customer AS c
+        """)
+
+        # init an emply list to hold customer representations
+        customers = []
+
+        # convert rows of data into python list
+        dataset = db_cursor.fetchall()
+
+        # iterate list returned from database
+        for row in dataset:
+            customer = Customer(row['id'], row['name'], row['address'],
+                                row['email'], row['password'])
+
+            customers.append(customer.__dict__)
+
+    # Use `json` package to properly serialize list as JSON
+    return json.dumps(customers)
+
 
 # return customer by id
+# def get_single_customer(id):
+#     requested_customer = None
+
+#     for customer in CUSTOMERS:
+#         if customer["id"] == id:
+#             requested_customer = customer
+
+#     return requested_customer
+
+#return customer by id
 def get_single_customer(id):
-    requested_customer = None
+    with sqlite3.connect("./kennel.db") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
 
-    for customer in CUSTOMERS:
-        if customer["id"] == id:
-            requested_customer = customer
+        db_cursor.execute("""
+        SELECT
+            c.id,
+            c.name,
+            c.address,
+            c.email,
+            c.password
+        FROM customer AS c
+        WHERE c.id = ?
+        """, ( id, ))
 
-    return requested_customer
+        # load the single returned result into memory
+        data = db_cursor.fetchone()
+
+        # create a customer instance from the current row
+        customer = Customer(data['id'], data['name'], data['address'], data['email'], data['password'])
+
+        #return
+        return json.dumps(customer.__dict__)
 
 # add new customer - accepts customer parameter
 def create_customer(customer):
