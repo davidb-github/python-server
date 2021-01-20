@@ -79,41 +79,82 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     # Here's a method on the class that overrides the parent's method.
     # It handles any GET request.
+    # def do_GET(self):
+    #     self._set_headers(200)
+    #     response = {}  # Default response
+
+    #     # Parse the URL and capture the tuple that is returned
+    #     (resource, id) = self.parse_url(self.path)
+
+    #     if resource == "animals":
+    #         if id is not None:
+    #             response = f"{get_single_animal(id)}"
+
+    #         else:
+    #             response = f"{get_all_animals()}"
+    #     #Book 1 Chapter 3 exercise - locations
+    #     if resource == "locations":
+    #         if id is not None:
+    #             response = f"{get_single_location(id)}"
+            
+    #         else:
+    #             response = f"{get_all_locations()}"
+    #     #Book 1 Chapter 3 exercise - employees
+    #     if resource == "employees":
+    #         if id is not None:
+    #             response = f"{get_single_employee(id)}"
+
+    #         else:
+    #             response = f"{get_all_employees()}"
+    #     # add get customers
+    #     if resource == "customers":
+    #         if id is not None:
+    #             response = f"{get_single_customer(id)}"
+
+    #         else:
+    #             response = f"{get_all_customers()}"
+
+
+    #     self.wfile.write(response.encode())
+
+    # Book 1 Chapter 10
+    # It handles any GET request.
     def do_GET(self):
         self._set_headers(200)
-        response = {}  # Default response
 
-        # Parse the URL and capture the tuple that is returned
-        (resource, id) = self.parse_url(self.path)
+        response = {}
 
-        if resource == "animals":
-            if id is not None:
-                response = f"{get_single_animal(id)}"
+        # Parse URL and store entire tuple in a variable
+        parsed = self.parse_url(self.path)
 
-            else:
-                response = f"{get_all_animals()}"
-        #Book 1 Chapter 3 exercise - locations
-        if resource == "locations":
-            if id is not None:
-                response = f"{get_single_location(id)}"
-            
-            else:
-                response = f"{get_all_locations()}"
-        #Book 1 Chapter 3 exercise - employees
-        if resource == "employees":
-            if id is not None:
-                response = f"{get_single_employee(id)}"
+        # Response from parse_url() is a tuple with 2
+        # items in it, which means the request was for
+        # `/animals` or `/animals/2`
+        if len(parsed) == 2:
+            ( resource, id ) = parsed
 
-            else:
-                response = f"{get_all_employees()}"
-        # add get customers
-        if resource == "customers":
-            if id is not None:
-                response = f"{get_single_customer(id)}"
+            if resource == "animals":
+                if id is not None:
+                    response = f"{get_single_animal(id)}"
+                else:
+                    response = f"{get_all_animals()}"
+            elif resource == "customers":
+                if id is not None:
+                    response = f"{get_single_customer(id)}"
+                else:
+                    response = f"{get_all_customers()}"
 
-            else:
-                response = f"{get_all_customers()}"
+        # Response from parse_url() is a tuple with 3
+        # items in it, which means the request was for
+        # `/resource?parameter=value`
+        elif len(parsed) == 3:
+            ( resource, key, value ) = parsed
 
+            # Is the resource `customers` and was there a
+            # query parameter that specified the customer
+            # email as a filtering value?
+            if key == "email" and resource == "customers":
+                response = get_customers_by_email(value)
 
         self.wfile.write(response.encode())
 
