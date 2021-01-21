@@ -74,21 +74,6 @@ def get_all_animals():
     return json.dumps(animals)
 
 
-# Function with a single parameter
-# def get_single_animal(id):
-#     # Variable to hold the found animal, if it exists
-#     requested_animal = None
-
-#     # Iterate the ANIMALS list above. Very similar to the
-#     # for..of loops you used in JavaScript.
-#     for animal in ANIMALS:
-#         # Dictionaries in Python use [] notation to find a key
-#         # instead of the dot notation that JavaScript used.
-#         if animal["id"] == id:
-#             requested_animal = animal
-
-#     return requested_animal
-
 # function with single param that calls sqllite
 def get_single_animal(id):
     with sqlite3.connect("./kennel.db") as conn:
@@ -204,12 +189,42 @@ def delete_animal(id):
         WHERE id = ?
         """, (id, ))
 
-# update existing animal - accepts animal id and new_anmial dict as parameters
+# update existing animal - accepts animal id and new_anmial dict as parameters        
 def update_animal(id, new_animal):
-    # Iterate the ANIMALS list, but use enumerate() so that
-    # you can access the index value of each item.
-    for index, animal in enumerate(ANIMALS):
-        if animal["id"] == id:
-            # Found the animal. Update the value.
-            ANIMALS[index] = new_animal
-            break
+    with sqlite3.connect("./kennel.db") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        UPDATE Animal
+            SET
+                name = ?,
+                breed = ?,
+                status = ?,
+                location_id = ?,
+                customer_id = ?
+        WHERE id = ?
+        """, (new_animal['name'], new_animal['breed'],
+              new_animal['status'], new_animal['location_id'],
+              new_animal['customer_id'], id, ))
+
+        # Were any rows affected?
+        # Did the client send an `id` that exists?
+        rows_affected = db_cursor.rowcount
+
+    if rows_affected == 0:
+        # Forces 404 response by main module
+        return False
+    else:
+        # Forces 204 response by main module
+        return True
+
+
+# update existing animal - accepts animal id and new_anmial dict as parameters
+# def update_animal(id, new_animal):
+#     # Iterate the ANIMALS list, but use enumerate() so that
+#     # you can access the index value of each item.
+#     for index, animal in enumerate(ANIMALS):
+#         if animal["id"] == id:
+#             # Found the animal. Update the value.
+#             ANIMALS[index] = new_animal
+#             break
