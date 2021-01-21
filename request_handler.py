@@ -77,48 +77,6 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept')
         self.end_headers()
 
-    # Here's a method on the class that overrides the parent's method.
-    # It handles any GET request.
-    # def do_GET(self):
-    #     self._set_headers(200)
-    #     response = {}  # Default response
-
-    #     # Parse the URL and capture the tuple that is returned
-    #     (resource, id) = self.parse_url(self.path)
-
-    #     if resource == "animals":
-    #         if id is not None:
-    #             response = f"{get_single_animal(id)}"
-
-    #         else:
-    #             response = f"{get_all_animals()}"
-    #     #Book 1 Chapter 3 exercise - locations
-    #     if resource == "locations":
-    #         if id is not None:
-    #             response = f"{get_single_location(id)}"
-            
-    #         else:
-    #             response = f"{get_all_locations()}"
-    #     #Book 1 Chapter 3 exercise - employees
-    #     if resource == "employees":
-    #         if id is not None:
-    #             response = f"{get_single_employee(id)}"
-
-    #         else:
-    #             response = f"{get_all_employees()}"
-    #     # add get customers
-    #     if resource == "customers":
-    #         if id is not None:
-    #             response = f"{get_single_customer(id)}"
-
-    #         else:
-    #             response = f"{get_all_customers()}"
-
-
-    #     self.wfile.write(response.encode())
-
-    # Book 1 Chapter 10
-    # It handles any GET request.
     def do_GET(self):
         self._set_headers(200)
 
@@ -212,7 +170,6 @@ class HandleRequests(BaseHTTPRequestHandler):
     #def do_PUT(self):
     #    self.do_POST()
     def do_PUT(self):
-        self._set_headers(204)
         content_len = int(self.headers.get('content-length', 0)) # 2nd arg is in case the content_len header does not exist
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
@@ -220,15 +177,26 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
+        # init var to hold return value
+        success = False
+
         # Update a single resource from the list
         if resource == "animals":
-            update_animal(id, post_body)
+            success = update_animal(id, post_body)
+
         elif resource == "locations":
-            update_location(id, post_body)
+            success = update_location(id, post_body)
+
         elif resource == "employees":
-            update_employee(id, post_body)
+            success = update_employee(id, post_body)
+
         elif resource == "customers":
-            update_customer(id, post_body)
+            success = update_customer(id, post_body)
+        
+        if success:
+            self._set_headers(204)
+        else:
+            self._set_headers(404)
 
         # Encode the new resource and send in response
         self.wfile.write("".encode())
