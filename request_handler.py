@@ -10,28 +10,6 @@ import json
 # work together for a common purpose. In this case, that
 # common purpose is to respond to HTTP requests from a client.
 class HandleRequests(BaseHTTPRequestHandler):
-    #book-1 chapter-3
-    # def parse_url(self, path):
-        # Just like splitting a string in JavaScript. If the
-        # path is "/animals/1", the resulting list will
-        # have "" at index 0, "animals" at index 1, and "1"
-        # at index 2.
-        # path_params = path.split("/")
-        # resource = path_params[1]
-        # id = None
-
-        # Try to get the item at index 2
-        # try:
-        #     # Convert the string "1" to the integer 1
-        #     # This is the new parseInt()
-        #     id = int(path_params[2])
-        # except IndexError:
-        #     pass  # No route parameter exists: /animals
-        # except ValueError:
-        #     pass  # Request had trailing slash: /animals/
-        # This is a tuple
-        # return (resource, id)
-    
     #book-1 chapter-10
     def parse_url(self, path):
         path_params = path.split("/")
@@ -133,6 +111,7 @@ class HandleRequests(BaseHTTPRequestHandler):
 
             elif key == "status" and resource == "animals":
                 response = f"{get_animals_by_status(value)}"
+                # f string ensures response is in string format
 
         self.wfile.write(response.encode())
 
