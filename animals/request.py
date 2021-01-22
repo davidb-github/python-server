@@ -71,14 +71,15 @@ def get_all_animals():
             # Animal class above.
             animal = Animal(row['id'], row['name'], row['breed'],
                             row['status'], row['location_id'],
-                            row['customer_id'])
+                            row['customer_id']) # location optional property
             
             # Create a Location instance from the current row
-            location = Location(row['location_name'], row['location_address'])
+            location = Location(row['id'], row['location_name'], row['location_address'])
             
-            # Add the dictionary representation of the location to the animal
+            # Assign the dictionary representation of the location object instance to the Animal.location property
             animal.location = location.__dict__
 
+            # add newly created animal object instance to the animals list as type dictionary
             animals.append(animal.__dict__)
 
     # Use `json` package to properly serialize list as JSON
