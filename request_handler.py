@@ -25,6 +25,7 @@ class HandleRequests(BaseHTTPRequestHandler):
             key = pair[0]  # 'email'
             value = pair[1]  # 'jenna@solis.com'
 
+            print(resource, key, value)
             return ( resource, key, value )
 
         # No query string parameter
