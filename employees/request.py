@@ -1,3 +1,4 @@
+from models.location import Location
 import sqlite3
 import json
 from models import Employee, employee
@@ -84,8 +85,12 @@ def get_single_employee(id):
             e.id,
             e.name,
             e.address,
-            e.location_id
+            e.location_id,
+            l.id AS location_id,
+            l.name AS location_name
         FROM employee AS e
+            JOIN location AS l
+        ON e.location_id = l.id
         WHERE e.id = ?
         """, ( id, ))
 
@@ -94,6 +99,9 @@ def get_single_employee(id):
 
         #create an employee instance from the current row
         employee = Employee(data['id'], data['name'], data['address'], data['location_id'])
+
+        location = Location(data['location_id'], data['location_name'])
+        employee.location = location.__dict__
 
     return json.dumps(employee.__dict__)
 

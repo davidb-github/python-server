@@ -1,7 +1,9 @@
+from models.customer import Customer
 import animals
 import sqlite3
 import json
 from models import Animal
+from models import Location
 
 ANIMALS = [
     {
@@ -47,8 +49,17 @@ def get_all_animals():
             a.breed,
             a.status,
             a.location_id,
-            a.customer_id
-        FROM animal a
+            a.customer_id,
+            l.name AS location_name,
+            l.address AS location_address,
+            c.id AS customer_id,
+            c.name AS customer_name,
+            c.address AS customer_address
+        FROM animal AS a
+        JOIN location AS l
+            ON l.id - a.location_id
+        JOIN customer AS c
+            ON c.id = a.customer_id
         """)
 
         # Initialize an empty list to hold all animal representations
@@ -66,28 +77,23 @@ def get_all_animals():
             # Animal class above.
             animal = Animal(row['id'], row['name'], row['breed'],
                             row['status'], row['location_id'],
-                            row['customer_id'])
+                            row['customer_id']) # location optional property
+            
+            # Create a Location instance from the current row
+            location = Location(row['id'], row['location_name'], row['location_address'])
 
+            customer = Customer(row['customer_id'], row['customer_name'], row['customer_address'])
+            animal.customer = customer.__dict__
+            
+            # Assign the dictionary representation of the location object instance to the Animal.location property
+            animal.location = location.__dict__
+
+            # add newly created animal object instance to the animals list as type dictionary
             animals.append(animal.__dict__)
 
     # Use `json` package to properly serialize list as JSON
     return json.dumps(animals)
 
-
-# Function with a single parameter
-# def get_single_animal(id):
-#     # Variable to hold the found animal, if it exists
-#     requested_animal = None
-
-#     # Iterate the ANIMALS list above. Very similar to the
-#     # for..of loops you used in JavaScript.
-#     for animal in ANIMALS:
-#         # Dictionaries in Python use [] notation to find a key
-#         # instead of the dot notation that JavaScript used.
-#         if animal["id"] == id:
-#             requested_animal = animal
-
-#     return requested_animal
 
 # function with single param that calls sqllite
 def get_single_animal(id):
@@ -100,12 +106,21 @@ def get_single_animal(id):
         db_cursor.execute("""
         SELECT
             a.id,
-            a.name,
+            a.name AS animal_name,
             a.breed,
             a.status,
             a.location_id,
-            a.customer_id
-        FROM animal a
+            a.customer_id,
+            l.id AS location_id,
+            l.name AS location_name,
+            c.id AS customer_id,
+            c.name AS customer_name,
+            c.address AS customer_address
+        FROM animal AS a
+        JOIN location AS l
+            ON l.id = a.location_id
+        JOIN customer AS c
+            ON c.id = a.customer_id
         WHERE a.id = ?
         """, ( id, ))
 
@@ -113,9 +128,15 @@ def get_single_animal(id):
         data = db_cursor.fetchone()
 
         # Create an animal instance from the current row
-        animal = Animal(data['id'], data['name'], data['breed'],
+        animal = Animal(data['id'], data['animal_name'], data['breed'],
                             data['status'], data['location_id'],
                             data['customer_id'])
+        
+        location = Location(data['id'], data['location_name'])
+        animal.location = location.__dict__
+
+        customer = Customer(data['customer_id'], data['customer_name'], data['customer_address'])
+        animal.customer = customer.__dict__
 
         return json.dumps(animal.__dict__)
 
@@ -196,26 +217,50 @@ def create_animal(animal):
 
 # function to delete animal - accepts animal (id) as parameter
 def delete_animal(id):
-    # Initial -1 value for animal index, in case one isn't found
-    animal_index = -1
+    with sqlite3.connect("./kennel.db") as conn:
+        db_cursor = conn.cursor()
 
-    # Iterate the ANIMALS list, but use enumerate() so that you
-    # can access the index value of each item
-    for index, animal in enumerate(ANIMALS):
-        if animal["id"] == id:
-            # Found the animal. Store the current index.
-            animal_index = index
+        db_cursor.execute("""
+        DELETE FROM animal
+        WHERE id = ?
+        """, (id, ))
 
-    # If the animal was found, use pop(int) to remove it from list
-    if animal_index >= 0:
-        ANIMALS.pop(animal_index)
+# update existing animal - accepts animal id and new_anmial dict as parameters        
+def update_animal(id, new_animal):
+    with sqlite3.connect("./kennel.db") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        UPDATE Animal
+            SET
+                name = ?,
+                breed = ?,
+                status = ?,
+                location_id = ?,
+                customer_id = ?
+        WHERE id = ?
+        """, (new_animal['name'], new_animal['breed'],
+              new_animal['status'], new_animal['location_id'],
+              new_animal['customer_id'], id, ))
+
+        # Were any rows affected?
+        # Did the client send an `id` that exists?
+        rows_affected = db_cursor.rowcount
+
+    if rows_affected == 0:
+        # Forces 404 response by main module
+        return False
+    else:
+        # Forces 204 response by main module
+        return True
+
 
 # update existing animal - accepts animal id and new_anmial dict as parameters
-def update_animal(id, new_animal):
-    # Iterate the ANIMALS list, but use enumerate() so that
-    # you can access the index value of each item.
-    for index, animal in enumerate(ANIMALS):
-        if animal["id"] == id:
-            # Found the animal. Update the value.
-            ANIMALS[index] = new_animal
-            break
+# def update_animal(id, new_animal):
+#     # Iterate the ANIMALS list, but use enumerate() so that
+#     # you can access the index value of each item.
+#     for index, animal in enumerate(ANIMALS):
+#         if animal["id"] == id:
+#             # Found the animal. Update the value.
+#             ANIMALS[index] = new_animal
+#             break
